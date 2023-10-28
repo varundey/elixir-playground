@@ -15,7 +15,7 @@ defmodule Streamer.Binance do
     )
   end
 
-  defp process_event(%{"e" => "trade" = event}) do
+  defp process_event(%{"e" => "trade"} = event) do
     trade_event = %Streamer.Binance.TradeEvent{
       :event_type => event["e"],
       :event_time => event["E"],
@@ -29,7 +29,12 @@ defmodule Streamer.Binance do
       :buyer_market_maker => event["m"]
     }
 
-    Logger.debug("Trade event received " <> "#{trade_event.symbol}@#{trade_event.price}")
+    Logger.debug(
+      "#{trade_event.event_type} " <>
+        "#{trade_event.symbol}@#{trade_event.price} for #{trade_event.quantity} " <>
+        "buyer - #{trade_event.buyer_order_id}  seller - #{trade_event.seller_order_id} " <>
+        "[transaction id - #{trade_event.trade_id}]"
+    )
   end
 
   def handle_frame({_type, msg}, state) do

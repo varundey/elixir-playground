@@ -1,4 +1,5 @@
 
+require Logger
 
 defmodule Streamer.Binance do
 	use WebSockex
@@ -17,7 +18,10 @@ defmodule Streamer.Binance do
   end
 
   def handle_frame({type, msg}, state) do
-    IO.puts "Received Message - Type: #{inspect type} -- Message: #{inspect msg}"
+  	case Jason.decode(msg) do
+  		{:ok, event} -> process_event(event)
+  		{:error, _} -> Logger.error("Unable to parse msg: #{msg}")
+  	end
     {:ok, state}
   end
 
